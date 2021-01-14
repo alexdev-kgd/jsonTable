@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -7,9 +8,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TableComponent implements OnInit {
 
-  constructor() { }
+  
+  constructor(private location:Location) { }
 
   ngOnInit(): void {
+    this.getData(history.state);
+  }
+
+  getData(data) {
+    if(!data) return;
+
+    for (const obj in data) {
+      for(const title in data[obj]) {
+        console.log(title);
+      }
+    }
   }
 
 }

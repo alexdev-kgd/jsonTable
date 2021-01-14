@@ -2,7 +2,7 @@
     <mat-label>Введите свой JSON</mat-label>
     <textarea matInput
               cdkAutosizeMinRows="5"
-              cdkAutosizeMaxRows="15"></textarea>
+              cdkAutosizeMaxRows="15" 
+              [(ngModel)]="jsonValue"></textarea>
 </mat-form-field>
-<button mat-stroked-button color="primary" [routerLink]="['/table']"
-                                           [state]="{ data: {} }">Primary</button>
+<button mat-stroked-button color="primary" (click)="textToJSON()">Primary</button>
