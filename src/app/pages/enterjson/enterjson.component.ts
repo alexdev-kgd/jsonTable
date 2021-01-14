@@ -20,7 +20,6 @@ export class EnterjsonComponent implements OnInit {
     this.jsonValue = this.jsonValue.replace(']"',']');
 
     let json = JSON.parse(this.jsonValue);
-    console.log(json);
     this.sendToTable(json);
   }
 
