@@ -9,6 +9,7 @@ import { Component, ElementRef, Inject, OnInit, Renderer2, ViewChild } from '@an
 export class TableComponent implements OnInit {
 
   @ViewChild('tableHeader', { static: true }) tableHeader: ElementRef;
+  @ViewChild('tableContent', { static: true }) tableContent: ElementRef;
 
   constructor(private location: Location, private renderer: Renderer2,
               private elRef: ElementRef, @Inject(DOCUMENT) private document) { }
@@ -20,7 +21,7 @@ export class TableComponent implements OnInit {
   getData(data) {
     if(!data) return;
     
-    //Get first object for extracting keys
+    //Get first object for extracting keys and values
     let dataObject = data[0];
     let objectKeys = Object.keys(dataObject);
 
@@ -33,6 +34,28 @@ export class TableComponent implements OnInit {
       renderer.appendChild(th, title);
       renderer.appendChild(this.tableHeader.nativeElement, th);
     }
+
+    //Go through array of data and get values of these objects in order to fill in table content
+    for(let v = 0; v < data.length; v++) {
+      console.log(v);
+      console.log(v == data.length - 1);
+      if(v == data.length - 1) return;
+
+      const values = Object.values<string>(data[v]);
+      const tr = document.createElement('tr');
+
+      for(let j = 0; j < values.length; j++) {
+        const renderer = this.renderer;
+        const td = document.createElement('td');
+        const value = renderer.createText(values[j]);
+  
+        renderer.appendChild(td, value);
+        renderer.appendChild(tr, td);        
+      }
+
+      this.renderer.appendChild(this.tableContent.nativeElement, tr);
+    }
+
   }
 
 }
