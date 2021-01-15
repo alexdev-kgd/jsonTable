@@ -36,12 +36,29 @@ export class TableComponent implements OnInit {
     }
 
     //Go through array of data and get values of these objects in order to fill in table content
-    for(let v = 0; v < data.length; v++) {
-      console.log(v);
-      console.log(v == data.length - 1);
-      if(v == data.length - 1) return;
+    // let prev;
+    // for(const obj in data) {
+    //   const values = Object.values<string>(obj);
+    //   const tr = document.createElement('tr');
 
-      const values = Object.values<string>(data[v]);
+    //   for(let j = 0; j < values.length; j++) {
+    //     const renderer = this.renderer;
+    //     const td = document.createElement('td');
+    //     const value = renderer.createText(values[j]);
+  
+    //     renderer.appendChild(td, value);
+    //     renderer.appendChild(tr, td);        
+    //   }
+
+    //   this.renderer.appendChild(this.tableContent.nativeElement, tr);
+    //   prev = obj;
+    // }
+
+    for(let i = 0; i < Object.values(data).length; i++) {
+      let length = Object.keys(data).length;
+      if(i == (length - 1)) return;
+
+      const values = Object.values<string>(data[i]);
       const tr = document.createElement('tr');
 
       for(let j = 0; j < values.length; j++) {
@@ -55,6 +72,25 @@ export class TableComponent implements OnInit {
 
       this.renderer.appendChild(this.tableContent.nativeElement, tr);
     }
+    // for(let v = 0; v < data.length; v++) {
+    //   console.log(v);
+    //   console.log(v == data.length - 1);
+    //   if(v == data.length - 1) return;
+
+    //   const values = Object.values<string>(data[v]);
+    //   const tr = document.createElement('tr');
+
+    //   for(let j = 0; j < values.length; j++) {
+    //     const renderer = this.renderer;
+    //     const td = document.createElement('td');
+    //     const value = renderer.createText(values[j]);
+  
+    //     renderer.appendChild(td, value);
+    //     renderer.appendChild(tr, td);        
+    //   }
+
+    //   this.renderer.appendChild(this.tableContent.nativeElement, tr);
+    // }
 
   }
 
