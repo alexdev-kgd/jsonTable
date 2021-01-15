@@ -18,13 +18,16 @@ export class TableComponent implements AfterViewInit {
               private elRef: ElementRef, @Inject(DOCUMENT) private document,
               private router: Router) { }
 
+    private json;
+  
   ngAfterViewInit(): void {
-    this.getData(history.state);
+    this.json = history.state;
+    this.getData(this.json);
   }
 
   getData(data) {
     if(data[0] === undefined) this.router.navigateByUrl('/enterjson');
-    console.log(data);
+
     //Get first object for extracting keys and values
     let dataObject = data[0],
         objectKeys = Object.keys(dataObject);
@@ -38,8 +41,10 @@ export class TableComponent implements AfterViewInit {
     this.insertData(objectKeys);
   }
 
-  editData(cellValues, titles) {
-    this.router.navigateByUrl('/editing', { state: { values: cellValues, titles: titles } });
+  editData(rowId, cellValues, titles) {
+    this.router.navigateByUrl('/editing', { state: { rowId: rowId, 
+                                                      values: cellValues, 
+                                                      titles: titles } });
   }
 
   getKeys(objectKeys) {
@@ -63,16 +68,18 @@ export class TableComponent implements AfterViewInit {
       if(i == (length - 1)) break;
 
       const values = Object.values<string>(data[i]);
-      this.insertRow(values);
+      let rowIndex = i;
+      this.insertRow(values, rowIndex);
     }
   }
 
-  insertRow(values) {
-    const tr = document.createElement('tr');
+  insertRow(values, rowIndex) {
+    const renderer = this.renderer,
+          tr = document.createElement('tr');
+    renderer.setAttribute(tr, 'data-value', Object.keys(this.json)[rowIndex]);
 
     for(let j = 0; j < values.length; j++) {
-      const renderer = this.renderer,
-            td = document.createElement('td'),
+      const td = document.createElement('td'),
             value = renderer.createText(values[j]);
 
       renderer.appendChild(td, value);
@@ -93,7 +100,8 @@ export class TableComponent implements AfterViewInit {
         cellValues.push(allCells[j].textContent);
       }
 
-      row.addEventListener('click', this.editData.bind(this, cellValues, objectKeys));
+      let rowId = 0;
+      row.addEventListener('click', this.editData.bind(this, rowId, cellValues, objectKeys));
     }
   }
 
