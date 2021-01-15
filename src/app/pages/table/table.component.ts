@@ -68,14 +68,13 @@ export class TableComponent implements AfterViewInit {
       for(let j = 0; j < allCells.length; j++) {
         cellValues.push(allCells[j].textContent);
       }
-      
-      row.addEventListener('click', this.editData.bind(this, cellValues));
+
+      row.addEventListener('click', this.editData.bind(this, cellValues, objectKeys));
     }
   }
 
-  editData(data) {
-    console.log(data);
-    this.router.navigateByUrl('/editing', { state: data });
+  editData(cellValues, titles) {
+    this.router.navigateByUrl('/editing', { state: { values: cellValues, titles: titles } });
   }
 
 }
