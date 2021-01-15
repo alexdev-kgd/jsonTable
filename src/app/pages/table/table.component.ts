@@ -42,7 +42,7 @@ export class TableComponent implements AfterViewInit {
     //Go through array of data and get values of these objects in order to fill in table content
     for(let i = 0; i < Object.values(data).length; i++) {
       let length = Object.keys(data).length;
-      if(i == (length - 1)) return;
+      if(i == (length - 1)) break;
 
       const values = Object.values<string>(data[i]);
       const tr = document.createElement('tr');
@@ -59,7 +59,18 @@ export class TableComponent implements AfterViewInit {
       this.renderer.appendChild(this.tableContent.nativeElement, tr);
     }
 
-    
+    let allRows = this.tableContent.nativeElement.querySelectorAll('tr');
+    for(let i = 0; i < allRows.length; i++ ) {
+      let row = allRows[i];
+      let allCells = row.querySelectorAll('td');
+      let cellValues = [];
+
+      for(let j = 0; j < allCells.length; j++) {
+        cellValues.push(allCells[j].textContent);
+      }
+      
+      row.addEventListener('click', this.editData.bind(this, cellValues));
+    }
   }
 
   editData(data) {
