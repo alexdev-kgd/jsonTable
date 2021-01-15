@@ -1,5 +1,7 @@
 import { Location, DOCUMENT } from '@angular/common';
-import { Component, ElementRef, Inject, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnInit,
+        Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table',
@@ -7,20 +9,21 @@ import { Component, ElementRef, Inject, OnInit, Renderer2, ViewChild, ViewEncaps
   styleUrls: ['./table.component.sass'],
   encapsulation: ViewEncapsulation.None
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements AfterViewInit {
 
   @ViewChild('tableHeader', { static: true }) tableHeader: ElementRef;
   @ViewChild('tableContent', { static: true }) tableContent: ElementRef;
 
   constructor(private location: Location, private renderer: Renderer2,
-              private elRef: ElementRef, @Inject(DOCUMENT) private document) { }
+              private elRef: ElementRef, @Inject(DOCUMENT) private document,
+              private router: Router) { }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.getData(history.state);
   }
 
   getData(data) {
-    if(!data) return;
+    if(data[0] === undefined) this.router.navigateByUrl('/enterjson');
     
     //Get first object for extracting keys and values
     let dataObject = data[0];
@@ -52,10 +55,16 @@ export class TableComponent implements OnInit {
         renderer.appendChild(td, value);
         renderer.appendChild(tr, td);        
       }
-
+      
       this.renderer.appendChild(this.tableContent.nativeElement, tr);
     }
 
+    
+  }
+
+  editData(data) {
+    console.log(data);
+    this.router.navigateByUrl('/editing', { state: data });
   }
 
 }
