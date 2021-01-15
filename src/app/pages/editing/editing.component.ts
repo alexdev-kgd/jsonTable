@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SimpleChanges, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -20,6 +20,7 @@ export class EditingComponent implements OnInit {
     if( (data.titles === undefined) && (data.values === undefined) ) 
       this.router.navigateByUrl('/enterjson');
 
+      console.log(data);
     let titles = data.titles,
         values = data.values;
 
@@ -27,13 +28,13 @@ export class EditingComponent implements OnInit {
       let title = titles[i],
           value = values[i];
       
-      let input = {"title": title, "value": value}
+      let input = {"title": title, "value": value};
       
       this.inputs.push(input);
     }
   }
 
-  assembleJSON(data){
-
+  saveData() {
+    this.router.navigateByUrl('/table', { state: this.inputs });
   }
 }

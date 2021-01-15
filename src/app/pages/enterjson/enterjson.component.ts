@@ -13,6 +13,10 @@ export class EnterjsonComponent implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
+    let data = history.state;
+    if(data[0]) {
+      
+    }
   }
 
   textToJSON() {

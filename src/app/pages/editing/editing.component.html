@@ -2,11 +2,10 @@
     <div id="form__inputBlock" *ngFor="let field of inputs">
         <mat-form-field>
             <mat-label>{{ field.title }}</mat-label>
-            <input matInput value="{{ field.value }}">
+            <input matInput [(ngModel)]="field.value" [ngModelOptions]="{standalone: true}">
         </mat-form-field>
         <br>
     </div>
-    <button mat-stroked-button color="primary" [routerLink]="['/enterjson']"
-                                           [state]="{ data: {} }">Primary</button>
+    <button mat-stroked-button color="primary" (click)="saveData()">Save</button>
 </form>
   
