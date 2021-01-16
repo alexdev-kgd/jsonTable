@@ -136,6 +136,8 @@ export class TableComponent implements AfterViewInit {
     }
 
     let updatedData = oldData;
+
+    localStorage.setItem('tableData', JSON.stringify(updatedData));
     return updatedData;
   }
 
