@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class TableComponent implements AfterViewInit {
-
+  
   @ViewChild('tableHeader', { static: true }) tableHeader: ElementRef;
   @ViewChild('tableContent', { static: true }) tableContent: ElementRef;
 
@@ -22,7 +22,20 @@ export class TableComponent implements AfterViewInit {
   
   ngAfterViewInit(): void {
     this.json = history.state;
-    this.getData(this.json);
+    this.checkData(this.json);
+  }
+
+  checkData(data) {
+    if( data.rowId !== undefined) {
+      let oldData = JSON.parse(localStorage.getItem('tableData'));
+
+      let editedJSON = this.replaceJSONRow(oldData, data);
+      this.getData(editedJSON);
+    } else {
+      localStorage.setItem('tableData', JSON.stringify(data));
+
+      this.getData(data);
+    }
   }
 
   getData(data) {
@@ -69,14 +82,14 @@ export class TableComponent implements AfterViewInit {
 
       const values = Object.values<string>(data[i]);
       let rowIndex = i;
-      this.insertRow(values, rowIndex);
+      this.insertRow(values, rowIndex, data);
     }
   }
 
-  insertRow(values, rowIndex) {
+  insertRow(values, rowIndex, data) {
     const renderer = this.renderer,
           tr = document.createElement('tr');
-    renderer.setAttribute(tr, 'data-value', Object.keys(this.json)[rowIndex]);
+    renderer.setAttribute(tr, 'data-value', Object.keys(data)[rowIndex]);
 
     for(let j = 0; j < values.length; j++) {
       const td = document.createElement('td'),
@@ -100,9 +113,30 @@ export class TableComponent implements AfterViewInit {
         cellValues.push(allCells[j].textContent);
       }
 
-      let rowId = 0;
+      let rowId = row.getAttribute('data-value');
       row.addEventListener('click', this.editData.bind(this, rowId, cellValues, objectKeys));
     }
+  }
+
+  replaceJSONRow(oldData, data) {
+    let id = data.rowId;
+
+    for(let el in oldData) {
+      if(el == id) {
+        let oldDataKeys = Object.keys(oldData[el]);
+
+        for(let i = 0; i < data.data.length; i++) {
+          for(let j = 0; j < oldDataKeys.length; j++) {
+            if(data.data[i].title == oldDataKeys[j]) {
+              oldData[el][oldDataKeys[j]] = data.data[i].value;
+            }
+          }
+        }
+      }
+    }
+
+    let updatedData = oldData;
+    return updatedData;
   }
 
 }

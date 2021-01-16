@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export class EditingComponent implements OnInit {
 
   public inputs: Array<{ title: string, value: any }> = [];
+  public rowId: string;
 
   constructor(private router: Router) { }
 
@@ -20,9 +21,10 @@ export class EditingComponent implements OnInit {
     if( (data.titles === undefined) && (data.values === undefined) ) 
       this.router.navigateByUrl('/enterjson');
 
-      console.log(data);
+    console.log(data);
     let titles = data.titles,
         values = data.values;
+    this.rowId = data.rowId;
 
     for (let i = 0; i < titles.length; i++) {
       let title = titles[i],
@@ -35,6 +37,7 @@ export class EditingComponent implements OnInit {
   }
 
   saveData() {
-    this.router.navigateByUrl('/table', { state: this.inputs });
+    this.router.navigateByUrl('/table', { state: { data: this.inputs, 
+                                                   rowId: this.rowId } });
   }
 }
