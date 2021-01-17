@@ -141,4 +141,25 @@ export class TableComponent implements AfterViewInit {
     return updatedData;
   }
 
+  loadoutJSON() {
+    let JSONObject = JSON.parse(localStorage.getItem('tableData')),
+        processedJSON = this.processJSONBeforeStringify(JSONObject);
+
+    let stringifiedJSON = JSON.stringify(processedJSON);
+
+    this.router.navigateByUrl('/enterjson', { state: { stringifiedJSON } });   
+  }
+
+  processJSONBeforeStringify(data) {
+    delete data.navigationId;
+    
+    let jsonArray = [];
+    for (const obj in data) {
+      console.log(obj);
+      console.log(data[obj]);
+      jsonArray.push(data[obj]);
+    }
+
+    return jsonArray;
+  }
 }

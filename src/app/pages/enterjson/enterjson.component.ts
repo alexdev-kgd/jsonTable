@@ -13,9 +13,15 @@ export class EnterjsonComponent implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    let data = history.state;
-    if(data[0]) {
-      
+    let json = history.state;
+    this.checkData(json);
+  }
+
+  checkData(data) {
+    let stringifiedJSON = data.stringifiedJSON;
+
+    if(stringifiedJSON !== undefined) {
+      this.appendData(stringifiedJSON);
     }
   }
 
@@ -29,5 +35,9 @@ export class EnterjsonComponent implements OnInit {
 
   sendToTable(json) {
     this.router.navigateByUrl('/table', { state: json });
+  }
+
+  appendData(data) {
+    this.jsonValue = data;
   }
 }
