@@ -26,16 +26,51 @@ export class TableComponent implements AfterViewInit {
   }
 
   checkData(data) {
-    if( data.rowId !== undefined) {
-      let oldData = JSON.parse(localStorage.getItem('tableData'));
-
-      let editedJSON = this.replaceJSONRow(oldData, data);
-      this.getData(editedJSON);
-    } else {
+    if( data.rowId === undefined) {
       localStorage.setItem('tableData', JSON.stringify(data));
-
       this.getData(data);
+    } else {
+      let oldData = JSON.parse(localStorage.getItem('tableData'));
+      
+      let editedJSON;
+      if(data.isNewRow) {
+        editedJSON = this.insertNewRow(oldData, data);
+      } else {
+        editedJSON = this.replaceJSONRow(oldData, data);
+      }
+      this.getData(editedJSON);
     }
+  }
+
+  insertNewRow(oldData, data) {
+    // const renderer = this.renderer,
+    //       tr = document.createElement('tr');
+    // renderer.setAttribute(tr, 'data-value', data.rowId);
+
+    let JSONValueObject = {};
+
+    for(let i = 0; i < data.data.length; i++) {
+      const td = document.createElement('td'),
+            title = data.data[i]['title'],
+            value = data.data[i]['value'];
+
+      // renderer.appendChild(td, renderer.createText(value));
+      // renderer.appendChild(tr, td);
+
+      let newKeyValuePair = {
+        [title]: value
+      }
+      Object.assign(JSONValueObject, newKeyValuePair);
+    }
+    //this.renderer.appendChild(this.tableContent.nativeElement, tr);
+
+    let newJSONDataRow = {
+      [data.rowId]: JSONValueObject
+    }
+    let updatedJSON = Object.assign(oldData, newJSONDataRow);
+
+    localStorage.setItem('tableData', JSON.stringify(updatedJSON));
+    return updatedJSON;
   }
 
   getData(data) {
@@ -48,16 +83,20 @@ export class TableComponent implements AfterViewInit {
     //Go through these keys and implement them into DOM as a table titles
     this.getKeys(objectKeys);
 
+    // Create Add New Row button
+    this.insertAddButton(data);
+
     //Go through array of data and get values of these objects in order to fill in table content
     this.getValues(data);
 
     this.insertData(objectKeys);
   }
 
-  editData(rowId, cellValues, titles) {
+  editData(rowId, cellValues, titles, isNewRow) {
     this.router.navigateByUrl('/editing', { state: { rowId: rowId, 
                                                       values: cellValues, 
-                                                      titles: titles } });
+                                                      titles: titles,
+                                                      isNewRow: isNewRow } });
   }
 
   getKeys(objectKeys) {
@@ -73,6 +112,67 @@ export class TableComponent implements AfterViewInit {
             title = renderer.createText(keys);
       renderer.appendChild(th, title);
       renderer.appendChild(this.tableHeader.nativeElement, th);
+  }
+
+  insertAddButton(data) {
+    const renderer = this.renderer,
+          th = document.createElement('th'),
+          buttonText = renderer.createText('Add New Row'),
+          button = renderer.createElement('button');
+
+          renderer.setAttribute(button, 'mat-stroked-button', '');
+          renderer.setAttribute(button, 'color', 'primary');
+          renderer.setStyle(th, "width", "150px");
+
+    renderer.appendChild(button, buttonText);
+    renderer.appendChild(th, button);
+    renderer.appendChild(this.tableHeader.nativeElement, th);
+
+    button.addEventListener('click', this.createNewRow.bind(this, data));    
+  }
+
+  createNewRow(data) {
+    let dataLength = Object.keys(data).length,
+        dataRowsCount = dataLength - 1,
+        newDataRowId = dataRowsCount++;
+
+        newDataRowId = this.preventConflict(newDataRowId);
+      
+    let titles = this.getTitles(),
+        cellValues = [];
+    
+    for(let i = 0; i < titles.length; i++) {
+      cellValues.push("");
+    }
+
+    let isNewRow = true;
+
+    this.editData(newDataRowId, cellValues, titles, isNewRow);
+  }
+
+  getTitles() {
+    let allTitles = this.tableHeader.nativeElement.querySelectorAll('th'),
+        titles = [];
+
+    for(let i = 0; i < allTitles.length-1; i++ ) {
+      titles.push(allTitles[i].innerText);
+    }
+    
+    return titles;
+  }
+
+  // Prevent IDs conflicts by searching up in row DOM Elements and compare their data-values
+  // with the new one
+  preventConflict(newDataRowId) {
+    let allRows = this.tableContent.nativeElement.querySelectorAll('tr');
+    for(let i = 0; i < allRows.length; i++ ) {
+      let row = allRows[i];
+
+      let rowId = this.getRowId(row);
+      if(rowId == newDataRowId) newDataRowId++;
+    } 
+
+    return newDataRowId;
   }
 
   getValues(data) {
@@ -113,9 +213,14 @@ export class TableComponent implements AfterViewInit {
         cellValues.push(allCells[j].textContent);
       }
 
-      let rowId = row.getAttribute('data-value');
-      row.addEventListener('click', this.editData.bind(this, rowId, cellValues, objectKeys));
+      let rowId = this.getRowId(row);
+      row.addEventListener('click', this.editData.bind(this, rowId, cellValues, 
+                                                       objectKeys, false));
     }
+  }
+
+  getRowId(row) {
+    return row.getAttribute('data-value');
   }
 
   replaceJSONRow(oldData, data) {
@@ -155,8 +260,6 @@ export class TableComponent implements AfterViewInit {
     
     let jsonArray = [];
     for (const obj in data) {
-      console.log(obj);
-      console.log(data[obj]);
       jsonArray.push(data[obj]);
     }
 

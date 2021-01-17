@@ -10,18 +10,20 @@ export class EditingComponent implements OnInit {
 
   public inputs: Array<{ title: string, value: any }> = [];
   public rowId: string;
+  public isNewRow: boolean = false;
 
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    this.editData(history.state)
+    let data = history.state;
+    if(data.isNewRow) this.isNewRow = true;
+    this.editData(data);
   }
 
   editData(data) {
     if( (data.titles === undefined) && (data.values === undefined) ) 
       this.router.navigateByUrl('/enterjson');
 
-    console.log(data);
     let titles = data.titles,
         values = data.values;
     this.rowId = data.rowId;
@@ -38,6 +40,7 @@ export class EditingComponent implements OnInit {
 
   saveData() {
     this.router.navigateByUrl('/table', { state: { data: this.inputs, 
-                                                   rowId: this.rowId } });
+                                                   rowId: this.rowId,
+                                                   isNewRow: this.isNewRow } });
   }
 }
