@@ -43,10 +43,6 @@ export class TableComponent implements AfterViewInit {
   }
 
   insertNewRow(oldData, data) {
-    // const renderer = this.renderer,
-    //       tr = document.createElement('tr');
-    // renderer.setAttribute(tr, 'data-value', data.rowId);
-
     let JSONValueObject = {};
 
     for(let i = 0; i < data.data.length; i++) {
@@ -54,15 +50,11 @@ export class TableComponent implements AfterViewInit {
             title = data.data[i]['title'],
             value = data.data[i]['value'];
 
-      // renderer.appendChild(td, renderer.createText(value));
-      // renderer.appendChild(tr, td);
-
       let newKeyValuePair = {
         [title]: value
       }
       Object.assign(JSONValueObject, newKeyValuePair);
     }
-    //this.renderer.appendChild(this.tableContent.nativeElement, tr);
 
     let newJSONDataRow = {
       [data.rowId]: JSONValueObject
@@ -191,9 +183,26 @@ export class TableComponent implements AfterViewInit {
           tr = document.createElement('tr');
     renderer.setAttribute(tr, 'data-value', Object.keys(data)[rowIndex]);
 
-    for(let j = 0; j < values.length; j++) {
-      const td = document.createElement('td'),
-            value = renderer.createText(values[j]);
+    for(let j = 0; j < values.length+1; j++) {
+      const td = document.createElement('td');
+      let value;
+
+      if(j == values.length) {
+        let buttonText = renderer.createText('Delete'),
+            button = renderer.createElement('button');
+
+            renderer.setAttribute(button, 'mat-stroked-button', '');
+            renderer.setAttribute(button, 'color', 'primary');
+            renderer.setAttribute(button, 'data-value', Object.keys(data)[rowIndex]);
+            renderer.setStyle(td, "width", "150px");
+            renderer.appendChild(button, buttonText);
+            button.addEventListener('click', function(event) {event.stopPropagation()});
+            button.addEventListener('click', this.deleteRow.bind(this, data));
+
+        value = button;
+      } else {
+        value = renderer.createText(values[j]);
+      }
 
       renderer.appendChild(td, value);
       renderer.appendChild(tr, td);        
@@ -201,6 +210,23 @@ export class TableComponent implements AfterViewInit {
     
     this.renderer.appendChild(this.tableContent.nativeElement, tr);
   };
+
+  deleteRow(data, button) {
+    let rowId = button.currentTarget.getAttribute('data-value'),
+        keys = Object.keys(data),
+        rowsElements = this.tableContent.nativeElement.querySelectorAll('tr');
+    for (let i = 0; i < keys.length; i++) {
+      if(+keys[i] == rowId) delete data[keys[i]];
+    }
+
+    for (let j = 0; j < rowsElements.length; j++) {
+      let rowDataValue = rowsElements[j].getAttribute('data-value');
+      if(rowDataValue == rowId) this.renderer.removeChild(this.tableContent, 
+                                                          rowsElements[j]);
+    }
+
+    localStorage.setItem('tableData', JSON.stringify(data));
+  }
 
   insertData(objectKeys) {
     let allRows = this.tableContent.nativeElement.querySelectorAll('tr');
