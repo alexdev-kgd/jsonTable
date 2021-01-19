@@ -18,7 +18,7 @@ export class TableComponent implements AfterViewInit {
               private elRef: ElementRef, @Inject(DOCUMENT) private document,
               private router: Router) { }
 
-    private json;
+  private json;
   
   ngAfterViewInit(): void {
     this.json = history.state;
@@ -139,6 +139,7 @@ export class TableComponent implements AfterViewInit {
 
     let isNewRow = true;
 
+    console.log(newDataRowId);
     this.editData(newDataRowId, cellValues, titles, isNewRow);
   }
 
@@ -168,13 +169,18 @@ export class TableComponent implements AfterViewInit {
   }
 
   getValues(data) {
+    console.log(data);
     for(let i = 0; i < Object.values(data).length; i++) {
       let length = Object.keys(data).length;
       if(i == (length - 1)) break;
-
-      const values = Object.values<string>(data[i]);
-      let rowIndex = i;
-      this.insertRow(values, rowIndex, data);
+      if(data[i] === undefined) {
+        console.log("Not found:", i);
+      } else {
+        const values = Object.values<string>(data[i]);
+        let rowIndex = i;
+        this.insertRow(values, rowIndex, data);
+      }
+      console.log(i);
     }
   }
 
@@ -291,4 +297,5 @@ export class TableComponent implements AfterViewInit {
 
     return jsonArray;
   }
+
 }
