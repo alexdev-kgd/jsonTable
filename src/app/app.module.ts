@@ -14,6 +14,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatInputModule } from '@angular/material/input'; 
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field'; 
+import { Table } from './pages/table/table';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     TableComponent,
     EditingComponent
   ],
-  providers: [],
+  providers: [{
+    provide: Table,
+    useClass: Table
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

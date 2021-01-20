@@ -1,28 +1,63 @@
+import { Location, DOCUMENT } from '@angular/common';
+import { ElementRef, Inject, Renderer2, Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+    template: ''
+})
 export class Table {
-    public constructor(json) {
-        this.JSONdata.checkData(json);
+
+    public constructor(private location: Location, private renderer: Renderer2,
+        private elRef: ElementRef, @Inject(DOCUMENT) private document,
+        private router: Router) {
+        
     }
+
+    TableElements = {
+        outerLink: this,
+        header: null,
+        container: null,
+
+        setHeaderElement(header) {
+            this.header = header
+        },
+
+        setContainerElement(container) {
+            this.container = container
+        },
+
+        getHeaderElement() {
+            return this.header;
+        },
+
+        getContainerElement() {
+            return this.container;
+        }
+    } 
 
     TableManipulations = {
         outerLink: this,
 
         insertTitles(keys) {
-            let renderer = this.renderer,
-                th = document.createElement('th'),
-                title = renderer.createText(keys);
+            console.log(keys);
+            let renderer = this.outerLink.renderer,
+                th = this.outerLink.document.createElement('th'),
+                title = renderer.createText(keys),
+                header = this.outerLink.TableElements.getHeaderElement();
 
             renderer.appendChild(th, title);
-            renderer.appendChild(this.tableHeader.nativeElement, th);
+            renderer.appendChild(header.nativeElement, th);
         },
 
         insertRow(values, rowIndex, data){
-            let renderer = this.renderer,
-                tr = document.createElement('tr');
+            let renderer = this.outerLink.renderer,
+                tr = this.outerLink.document.createElement('tr'),
+                container = this.outerLink.TableElements.getContainerElement();
             renderer.setAttribute(tr, 'data-value', Object.keys(data)[rowIndex]);
         
             for(let j = 0; j < values.length+1; j++) {
-                const td = document.createElement('td');
-                let value;
+                let td = this.outerLink.document.createElement('td'),
+                    value;
         
                 if(j == values.length) {
                 let buttonText = renderer.createText('Delete'),
@@ -37,21 +72,42 @@ export class Table {
                     button.addEventListener('click', function(event) {event.stopPropagation()});
                     button.addEventListener('click', this.deleteRow.bind(this, data));
         
-                value = button;
+                    value = button;
                 } else {
-                value = renderer.createText(values[j]);
+                    value = renderer.createText(values[j]);
                 }
         
                 renderer.appendChild(td, value);
                 renderer.appendChild(tr, td);        
             }
             
-            this.renderer.appendChild(this.tableContent.nativeElement, tr);
+            renderer.appendChild(container.nativeElement, tr);
+        },
+
+        insertData(objectKeys) {
+            let container = this.outerLink.TableElements.getContainerElement();
+            let allRows = container.nativeElement.querySelectorAll('tr');
+
+            for(let i = 0; i < allRows.length; i++ ) {
+                let row = allRows[i],
+                    allCells = row.querySelectorAll('td'),
+                    cellValues = [];
+
+                for(let j = 0; j < allCells.length; j++) {
+                    cellValues.push(allCells[j].textContent);
+                }
+                let rowId = this.getRowId(row);
+
+                row.addEventListener('click', this.outerLink.JSONdata.editData.bind(this, rowId, cellValues, 
+                                                                objectKeys, false));
+            }            
         },
 
         insertAddButton(data) {
-            let renderer = this.renderer,
-                th = document.createElement('th'),
+            let header = this.outerLink.TableElements.getHeaderElement();
+
+            let renderer = this.outerLink.renderer,
+                th = this.outerLink.document.createElement('th'),
                 buttonText = renderer.createText('Add New Row'),
                 button = renderer.createElement('button');
     
@@ -61,9 +117,21 @@ export class Table {
         
             renderer.appendChild(button, buttonText);
             renderer.appendChild(th, button);
-            renderer.appendChild(this.tableHeader.nativeElement, th);
+            renderer.appendChild(header.nativeElement, th);
         
             button.addEventListener('click', this.outerLink.JSONdata.createNewRow.bind(this, data));    
+        },
+
+        getTitles() {
+            let header = this.outerLink.TableElements.getHeaderElement(),
+                allTitles = header.nativeElement.querySelectorAll('th'),
+                titles = [];
+        
+            for(let i = 0; i < allTitles.length-1; i++ ) {
+                titles.push(allTitles[i].innerText);
+            }
+            
+            return titles;
         },
 
         getRowId(row) {
@@ -73,25 +141,26 @@ export class Table {
         deleteRow(data, button) {
             let rowId = button.currentTarget.getAttribute('data-value'),
                 keys = Object.keys(data),
-                rowsElements = this.tableContent.nativeElement.querySelectorAll('tr');
+                container = this.outerLink.TableElements.getContainerElement(),
+                rowsElements = container.nativeElement.querySelectorAll('tr');
             for (let i = 0; i < keys.length; i++) {
                 if(+keys[i] == rowId) delete data[keys[i]];
             }
         
             for (let j = 0; j < rowsElements.length; j++) {
                 let rowDataValue = rowsElements[j].getAttribute('data-value');
-                if(rowDataValue == rowId) this.renderer.removeChild(this.tableContent, 
+                if(rowDataValue == rowId) this.outerLink.renderer.removeChild(container, 
                                                                     rowsElements[j]);
             }
         
             this.outerLink.JSONdata.saveJSON(data);
-            localStorage.setItem('tableData', JSON.stringify(data));
         },
 
         // Prevent IDs conflicts by searching up in row DOM Elements and compare their data-values
         // with the new one
         preventConflict(newDataRowId) {
-            let allRows = this.tableContent.nativeElement.querySelectorAll('tr');
+            let container = this.outerLink.TableElements.getContainerElement(),
+                allRows = container.nativeElement.querySelectorAll('tr');
             for(let i = 0; i < allRows.length; i++ ) {
             let row = allRows[i];
 
@@ -106,41 +175,43 @@ export class Table {
     JSONdata = {
         outerLink: this,
 
-        checkData(data) {
+        checkData(data): boolean {
             if( data.rowId === undefined) {
-                localStorage.setItem('tableData', JSON.stringify(data));
-                this.getData(data);
+                return false;
             } else {
-                let oldData = JSON.parse(localStorage.getItem('tableData')),
-                    editedJSON;
-    
-                data.isNewRow ? editedJSON = this.insertNewJSONRow(oldData, data) : 
-                                            editedJSON = this.replaceJSONRow(oldData, data);
-    
-                this.getData(editedJSON);
+                return true;
             }  
+        },
+
+        getEditedJSON(oldData, data) {
+            let editedJSON;
+            data.isNewRow ? editedJSON = this.outerLink.JSONdata.insertNewJSONRow(oldData, data) : 
+                            editedJSON = this.outerLink.JSONdata.replaceJSONRow(oldData, data);
+            
+            return editedJSON;
         },
 
         getData(data) {
             if(data[0] === undefined) {
-                this.router.navigateByUrl('/enterjson');
+                this.outerLink.router.navigateByUrl('/enterjson');
                 return;
             }
 
             //Get first object for extracting keys and values
-            let dataObject = data[0],
-                objectKeys = Object.keys(dataObject);
+            let objectKeys = this.getJSONkeys(data);
         
             //Go through these keys and implement them into DOM as a table titles
             this.getKeys(objectKeys);
         
-            // Create Add New Row button
-            this.insertAddButton(data);
-        
             //Go through array of data and get values of these objects in order to fill in table content
             this.getValues(data);
+
+            this.outerLink.TableManipulations.insertAddButton(data);
+            this.outerLink.TableManipulations.insertData(objectKeys);
+        },
         
-            this.insertData(objectKeys);
+        getJSONkeys(data) {
+            return Object.keys(data[0]);
         },
 
         getKeys(objectKeys) {
@@ -160,11 +231,10 @@ export class Table {
                 if(data[i] === undefined) {
                     console.log("Not found:", i);
                 } else {
+                    let values = Object.values<string>(data[i]),
+                        rowIndex = i;
 
-                let values = Object.values<string>(data[i]),
-                    rowIndex = i;
-
-                this.outerLink.TableManipulations.insertRow(values, rowIndex, data);
+                    this.outerLink.TableManipulations.insertRow(values, rowIndex, data);
                 }
 
                 console.log(i);
@@ -178,7 +248,7 @@ export class Table {
         
                 newDataRowId = this.outerLink.TableManipulations.preventConflict(newDataRowId);
                 
-            let titles = this.getTitles(),
+            let titles = this.outerLink.TableManipulations.getTitles(),
                 cellValues = [];
             
             for(let i = 0; i < titles.length; i++) {
@@ -188,7 +258,7 @@ export class Table {
             let isNewRow = true;
         
             console.log(newDataRowId);
-            this.editData(newDataRowId, cellValues, titles, isNewRow);
+            this.outerLink.JSONdata.editData(newDataRowId, cellValues, titles, isNewRow);
         },
 
         insertNewJSONRow(oldData, data) {
@@ -214,25 +284,8 @@ export class Table {
             return updatedJSON;
         },
 
-        insertData(objectKeys) {
-            let allRows = this.tableContent.nativeElement.querySelectorAll('tr');
-
-            for(let i = 0; i < allRows.length; i++ ) {
-                let row = allRows[i],
-                    allCells = row.querySelectorAll('td'),
-                    cellValues = [];
-
-                for(let j = 0; j < allCells.length; j++) {
-                    cellValues.push(allCells[j].textContent);
-                }
-                let rowId = this.getRowId(row);
-                row.addEventListener('click', this.editData.bind(this, rowId, cellValues, 
-                                                                objectKeys, false));
-            }            
-        },
-
         editData(rowId, cellValues, titles, isNewRow) {
-            this.router.navigateByUrl('/editing', { state: { rowId: rowId, 
+            this.outerLink.router.navigateByUrl('/editing', { state: { rowId: rowId, 
                                                               values: cellValues, 
                                                               titles: titles,
                                                               isNewRow: isNewRow } });
@@ -260,17 +313,21 @@ export class Table {
             return updatedData;
         },
 
+        loadJSON() {
+            return JSON.parse(localStorage.getItem('tableData'));
+        },
+
         saveJSON(data) {
             localStorage.setItem('tableData', JSON.stringify(data));
         },
 
         loadoutJSON() {
-            let JSONObject = JSON.parse(localStorage.getItem('tableData')),
+            let JSONObject = this.loadJSON(),
                 processedJSON = this.processJSONBeforeStringify(JSONObject);
         
             let stringifiedJSON = JSON.stringify(processedJSON);
         
-            this.router.navigateByUrl('/enterjson', { state: { stringifiedJSON } });   
+            this.outerLink.router.navigateByUrl('/enterjson', { state: { stringifiedJSON } });   
         },
         
         processJSONBeforeStringify(data) {
