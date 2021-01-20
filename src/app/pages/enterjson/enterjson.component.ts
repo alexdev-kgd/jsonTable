@@ -1,5 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import * as  $  from 'jquery-csv'
+declare let $: any;
 
 @Component({
   selector: 'app-enterjson',
@@ -18,15 +20,22 @@ export class EnterjsonComponent implements OnInit {
   }
 
   onLoaded(event) {
-    let file = event.srcElement.files[0];
+    let file = event.srcElement.files[0],
+        allowedExtensions = ["application/json", "application/vnd.ms-excel"];
 
     if(!file) throw Error('Error occured while loading file');
-    if(file.type != "application/json") throw Error('Wrong file type');
+    if(!allowedExtensions.includes(file.type)) throw Error('Wrong file type');
 
     let reader = new FileReader();
         reader.readAsText(file, "UTF-8");
         reader.onload = (evt) => {
-          let receivedJSON = JSON.stringify(evt.target['result']);
+          let receivedJSON;
+          if(file.type == "application/vnd.ms-excel") {
+            receivedJSON = JSON.stringify($.csv.toObjects(evt.target['result']));
+            this.jsonValue = receivedJSON;
+            return;
+          }
+          receivedJSON = JSON.stringify(evt.target['result']);
           this.jsonValue = JSON.parse(receivedJSON);
         }
         reader.onerror = (evt) => {
