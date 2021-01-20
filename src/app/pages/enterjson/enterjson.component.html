@@ -1,8 +1,13 @@
-<mat-form-field>
-    <mat-label>Введите свой JSON</mat-label>
-    <textarea matInput
-              cdkAutosizeMinRows="5"
-              cdkAutosizeMaxRows="15" 
-              [(ngModel)]="jsonValue"></textarea>
-</mat-form-field>
+<div id="mainContainer">
+    <mat-form-field>
+        <mat-label>Введите свой JSON</mat-label>
+        <textarea matInput
+                  cdkAutosizeMinRows="5"
+                  cdkAutosizeMaxRows="15" 
+                  [(ngModel)]="jsonValue"></textarea>
+    </mat-form-field>
+    <div id="inputFileBlock">
+        <input type="file" (change)="onLoaded($event)">
+    </div>
+</div>
 <button mat-stroked-button color="primary" (click)="textToJSON()">Load</button>

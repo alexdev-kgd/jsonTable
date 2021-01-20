@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -15,6 +15,23 @@ export class EnterjsonComponent implements OnInit {
   ngOnInit(): void {
     let json = history.state;
     this.checkData(json);
+  }
+
+  onLoaded(event) {
+    let file = event.srcElement.files[0];
+
+    if(!file) throw Error('Error occured while loading file');
+    if(file.type != "application/json") throw Error('Wrong file type');
+
+    let reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+        reader.onload = (evt) => {
+          let receivedJSON = JSON.stringify(evt.target['result']);
+          this.jsonValue = JSON.parse(receivedJSON);
+        }
+        reader.onerror = (evt) => {
+          console.log('Error occured reading file');
+        }
   }
 
   checkData(data) {
