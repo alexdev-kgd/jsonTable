@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field'; 
 import { Table } from './pages/table/table';
+import { WindowRefService } from './pages/window-ref.service';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,7 @@ import { Table } from './pages/table/table';
   providers: [{
     provide: Table,
     useClass: Table
-  }],
+  }, WindowRefService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

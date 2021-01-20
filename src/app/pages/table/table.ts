@@ -169,6 +169,14 @@ export class Table {
             } 
 
             return newDataRowId;
+        },
+
+        createLinkForJSONfile(data) {
+        let link = this.outerLink.document.createElement('a');
+            link.setAttribute('href', 
+                              'data:text/plain;charset=utf-u,'+encodeURIComponent(data));
+            link.setAttribute('download', 'jsonfile.json');
+            link.click();
         }
     };
 
@@ -328,6 +336,14 @@ export class Table {
             let stringifiedJSON = JSON.stringify(processedJSON);
         
             this.outerLink.router.navigateByUrl('/enterjson', { state: { stringifiedJSON } });   
+        },
+
+        saveAsJSONFile() {
+            let JSONObject = this.loadJSON(),
+                processedJSON = this.processJSONBeforeStringify(JSONObject),
+                stringifiedJSON = JSON.stringify(processedJSON);
+                
+            this.outerLink.TableManipulations.createLinkForJSONfile(stringifiedJSON);
         },
         
         processJSONBeforeStringify(data) {

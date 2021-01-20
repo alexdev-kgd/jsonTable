@@ -32,8 +32,12 @@ export class TableComponent implements AfterViewInit {
     }
   }
 
+  //Onclick functions
   loadoutJSON() {
     this.table.JSONdata.loadoutJSON();
+  }
+  saveAsJSONFile() {
+    this.table.JSONdata.saveAsJSONFile();
   }
 
 }
