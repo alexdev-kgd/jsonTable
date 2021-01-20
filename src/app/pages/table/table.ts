@@ -63,7 +63,7 @@ export class Table {
                 let buttonText = renderer.createText('Delete'),
                     button = renderer.createElement('button');
         
-                    renderer.setAttribute(button, 'mat-stroked-button', '');
+                    renderer.setAttribute(button, 'class', 'btn btn-secondary');
                     renderer.setAttribute(button, 'color', 'primary');
                     renderer.setAttribute(button, 'data-value', Object.keys(data)[rowIndex]);
                     renderer.setStyle(td, "width", "150px");
@@ -111,7 +111,7 @@ export class Table {
                 buttonText = renderer.createText('Add New Row'),
                 button = renderer.createElement('button');
     
-                renderer.setAttribute(button, 'mat-stroked-button', '');
+                renderer.setAttribute(button, 'class', 'btn btn-primary');
                 renderer.setAttribute(button, 'color', 'primary');
                 renderer.setStyle(th, "width", "150px");
         
