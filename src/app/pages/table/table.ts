@@ -41,6 +41,23 @@ export class Table {
     TableManipulations = {
         outerLink: this,
 
+        updateTable(data) {
+            let renderer = this.outerLink.renderer,
+                header = this.outerLink.TableElements.getHeaderElement(),
+                container = this.outerLink.TableElements.getContainerElement(),
+                allRows = container.nativeElement.querySelectorAll('tr'),
+                allTitles = header.nativeElement.querySelectorAll('th');
+
+                for (let i = 0; i < allRows.length; i++) {
+                    allRows[i].remove();
+                }
+                for (let j = 0; j < allTitles.length; j++) {
+                    allTitles[j].remove();
+                }
+
+                this.outerLink.JSONdata.getData(data);
+        },
+
         insertTitles(keys) {
             console.log(keys);
             let renderer = this.outerLink.renderer,
@@ -63,19 +80,20 @@ export class Table {
         
                 if(j == values.length) {
                     renderer.setStyle(td, "width", "150px");
+                    let rowId = Object.keys(data)[rowIndex];
 
-                    let button = this.createButton('btn btn-secondary', 'Delete', Object.keys(data)[rowIndex]);
+                    let button = this.createButton('btn btn-secondary', 'Delete', rowId);
                                  this.bindFuncToButton(button, function(event) {event.stopPropagation()});
                                  this.bindFuncToButton(button, this.deleteRow.bind(this, data));
                                  this.insertButton(button, td);
 
-                    let buttonUp = this.createButton('btn btn-primary btn-up', 'Up', Object.keys(data)[rowIndex]);
+                    let buttonUp = this.createButton('btn btn-primary btn-up', 'Up', rowId);
                                    this.bindFuncToButton(buttonUp, function(event) {event.stopPropagation()});
-                                   this.bindFuncToButton(buttonUp, this.outerLink.JSONdata.moveRowUp.bind(this, data));
+                                   this.bindFuncToButton(buttonUp, this.outerLink.JSONdata.moveRow.bind(this, data, 'up'));
 
-                    let buttonDown = this.createButton('btn btn-primary btn-down', 'Down', Object.keys(data)[rowIndex]);
+                    let buttonDown = this.createButton('btn btn-primary btn-down', 'Down', rowId);
                                      this.bindFuncToButton(buttonDown, function(event) {event.stopPropagation()});
-                                     this.bindFuncToButton(buttonDown, this.outerLink.JSONdata.moveRowDown.bind(this, data));
+                                     this.bindFuncToButton(buttonDown, this.outerLink.JSONdata.moveRow.bind(this, data, 'down'));
                     
                     let orderBtnsContainer = this.createBtnContainer('orderBtnsContainer');
                                              this.appendContainer(orderBtnsContainer, td);     
@@ -383,12 +401,33 @@ export class Table {
                                                               isNewRow: isNewRow } });
         },
 
-        moveRowUp(data) {
+        moveRow(data, direction, button) {
+            let rowId = button.currentTarget.getAttribute('data-value'),
+                keys = Object.keys(data);
+            for (let i = 0; i < keys.length; i++) {
+                if(+keys[i] == rowId) {
+                    if(direction == 'up') {
+                        let decrementKey = +keys[i];
+                        decrementKey--;
 
-        },
+                        if(data[decrementKey] === undefined) return;
+                        let saveRowData = data[decrementKey];
+                            data[decrementKey] = data[keys[i]]
+                            data[keys[i]] = saveRowData;
+                    } else if(direction == 'down') {
+                        let incrementKey = +keys[i];
+                        incrementKey++;
 
-        moveRowDown(data) {
+                        if(data[incrementKey] === undefined) return;
+                        let saveRowData = data[incrementKey];
+                            data[incrementKey] = data[keys[i]]
+                            data[keys[i]] = saveRowData;
+                    }
+                }
+            }
 
+            this.outerLink.JSONdata.saveJSON(data);
+            this.outerLink.TableManipulations.updateTable(data);
         },
         
         replaceJSONRow(oldData, data) {
