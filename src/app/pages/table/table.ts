@@ -42,11 +42,10 @@ export class Table {
         outerLink: this,
 
         updateTable(data) {
-            let renderer = this.outerLink.renderer,
-                header = this.outerLink.TableElements.getHeaderElement(),
-                container = this.outerLink.TableElements.getContainerElement(),
-                allRows = container.nativeElement.querySelectorAll('tr'),
-                allTitles = header.nativeElement.querySelectorAll('th');
+                let header = this.outerLink.TableElements.getHeaderElement(),
+                    container = this.outerLink.TableElements.getContainerElement(),
+                    allRows = container.nativeElement.querySelectorAll('tr'),
+                    allTitles = header.nativeElement.querySelectorAll('th');
 
                 for (let i = 0; i < allRows.length; i++) {
                     allRows[i].remove();
@@ -253,13 +252,6 @@ export class Table {
                         delete data[keys[j]];
                 }
             }
-        
-            // for (let j = 0; j < rowsElements.length; j++) {
-            //     let rowDataValue = rowsElements[j].getAttribute('data-value');
-                
-            //     if(rowDataValue == rowId) this.outerLink.renderer.removeChild(container, 
-            //                                                         rowsElements[j]);
-            // }
         
             this.outerLink.JSONdata.saveJSON(data);
             this.updateTable(data);

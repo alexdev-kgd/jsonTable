@@ -51,7 +51,14 @@ export class EnterjsonComponent implements OnInit {
     }
   }
 
+  isTextareaEmpty(jsonValue) {
+    if(jsonValue == "") return true;
+    return false;
+  }
+
   textToJSON() {
+    if(this.isTextareaEmpty(this.jsonValue)) return;
+
     this.jsonValue = this.jsonValue.replace('"[','[');
     this.jsonValue = this.jsonValue.replace(']"',']');
 
