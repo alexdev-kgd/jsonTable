@@ -59,32 +59,74 @@ export class Table {
             renderer.setAttribute(tr, 'data-value', Object.keys(data)[rowIndex]);
         
             for(let j = 0; j < values.length+1; j++) {
-                let td = this.outerLink.document.createElement('td'),
-                    value;
+                let td = this.outerLink.document.createElement('td');
         
                 if(j == values.length) {
-                let buttonText = renderer.createText('Delete'),
-                    button = renderer.createElement('button');
-        
-                    renderer.setAttribute(button, 'class', 'btn btn-secondary');
-                    renderer.setAttribute(button, 'color', 'primary');
-                    renderer.setAttribute(button, 'data-value', Object.keys(data)[rowIndex]);
                     renderer.setStyle(td, "width", "150px");
-                    renderer.appendChild(button, buttonText);
 
-                    button.addEventListener('click', function(event) {event.stopPropagation()});
-                    button.addEventListener('click', this.deleteRow.bind(this, data));
-        
-                    value = button;
+                    let button = this.createButton('btn btn-secondary', 'Delete', Object.keys(data)[rowIndex]);
+                                 this.bindFuncToButton(button, function(event) {event.stopPropagation()});
+                                 this.bindFuncToButton(button, this.deleteRow.bind(this, data));
+                                 this.insertButton(button, td);
+
+                    let buttonUp = this.createButton('btn btn-primary btn-up', 'Up', Object.keys(data)[rowIndex]);
+                                   this.bindFuncToButton(buttonUp, function(event) {event.stopPropagation()});
+                                   this.bindFuncToButton(buttonUp, this.outerLink.JSONdata.moveRowUp.bind(this, data));
+
+                    let buttonDown = this.createButton('btn btn-primary btn-down', 'Down', Object.keys(data)[rowIndex]);
+                                     this.bindFuncToButton(buttonDown, function(event) {event.stopPropagation()});
+                                     this.bindFuncToButton(buttonDown, this.outerLink.JSONdata.moveRowDown.bind(this, data));
+                    
+                    let orderBtnsContainer = this.createBtnContainer('orderBtnsContainer');
+                                             this.appendContainer(orderBtnsContainer, td);     
+                    let orderBtns = [];
+                        orderBtns.push(buttonUp);
+                        orderBtns.push(buttonDown);
+                        orderBtns.map((el) => { renderer.appendChild(orderBtnsContainer, el); });
                 } else {
-                    value = renderer.createText(values[j]);
+                    let value = renderer.createText(values[j]);
+                        renderer.appendChild(td, value);
                 }
-        
-                renderer.appendChild(td, value);
                 renderer.appendChild(tr, td);        
             }
-            
             renderer.appendChild(container.nativeElement, tr);
+        },
+
+        createBtnContainer(className) {
+            let renderer = this.outerLink.renderer,
+                divContainer = renderer.createElement('div');
+                
+            renderer.setAttribute(divContainer, 'class', className);
+
+            return divContainer;
+        },
+
+        appendContainer(container, destination) {
+            let renderer = this.outerLink.renderer;
+                renderer.appendChild(destination, container);           
+        },
+
+        createButton(className, text, dataValue) {
+            let renderer = this.outerLink.renderer,
+                buttonText = renderer.createText(text),
+                button = renderer.createElement('button');
+
+            renderer.setAttribute(button, 'class', className);
+            renderer.setAttribute(button, 'color', 'primary');
+            if(dataValue !== null) renderer.setAttribute(button, 'data-value', dataValue);
+
+            renderer.appendChild(button, buttonText);
+
+            return button;
+        },
+
+        insertButton(button, destination) {
+            let renderer = this.outerLink.renderer;
+                renderer.appendChild(destination, button);
+        },
+
+        bindFuncToButton(button, func) {
+            button.addEventListener('click', func); 
         },
 
         insertData(objectKeys) {
@@ -107,14 +149,26 @@ export class Table {
         },
 
         insertAddButton(data) {
+            let header = this.outerLink.TableElements.getHeaderElement(),
+                renderer = this.outerLink.renderer,
+                th = this.outerLink.document.createElement('th');
+                renderer.appendChild(header.nativeElement, th);
+                renderer.setStyle(th, "width", "150px");
+        
+            let button = this.createButton('btn btn-primary', 'Add New Row', null);
+            this.insertButton(button, th);
+            this.bindFuncToButton(button, this.outerLink.JSONdata.createNewRow.bind(this, data)); 
+        },
+
+        insertUpButton(data) {
             let header = this.outerLink.TableElements.getHeaderElement();
 
             let renderer = this.outerLink.renderer,
                 th = this.outerLink.document.createElement('th'),
-                buttonText = renderer.createText('Add New Row'),
+                buttonText = renderer.createText('Up'),
                 button = renderer.createElement('button');
     
-                renderer.setAttribute(button, 'class', 'btn btn-primary');
+                renderer.setAttribute(button, 'class', 'btn btn-primary btn-up');
                 renderer.setAttribute(button, 'color', 'primary');
                 renderer.setStyle(th, "width", "150px");
         
@@ -122,7 +176,26 @@ export class Table {
             renderer.appendChild(th, button);
             renderer.appendChild(header.nativeElement, th);
         
-            button.addEventListener('click', this.outerLink.JSONdata.createNewRow.bind(this, data));    
+            button.addEventListener('click', this.outerLink.JSONdata.moveRowUp.bind(this, data));    
+        },
+
+        insertDownButton(data) {
+            let header = this.outerLink.TableElements.getHeaderElement();
+
+            let renderer = this.outerLink.renderer,
+                th = this.outerLink.document.createElement('th'),
+                buttonText = renderer.createText('Down'),
+                button = renderer.createElement('button');
+    
+                renderer.setAttribute(button, 'class', 'btn btn-primary btn-up');
+                renderer.setAttribute(button, 'color', 'primary');
+                renderer.setStyle(th, "width", "150px");
+        
+            renderer.appendChild(button, buttonText);
+            renderer.appendChild(th, button);
+            renderer.appendChild(header.nativeElement, th);
+        
+            button.addEventListener('click', this.outerLink.JSONdata.moveRowDown.bind(this, data));    
         },
 
         getTitles() {
@@ -310,6 +383,14 @@ export class Table {
                                                               isNewRow: isNewRow } });
         },
 
+        moveRowUp(data) {
+
+        },
+
+        moveRowDown(data) {
+
+        },
+        
         replaceJSONRow(oldData, data) {
             let id = data.rowId;
 
