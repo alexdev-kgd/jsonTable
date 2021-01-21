@@ -1,6 +1,9 @@
 import { Location, DOCUMENT } from '@angular/common';
 import { ElementRef, Inject, Renderer2, Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { data } from 'jquery';
+import * as  $  from 'jquery-csv';
+declare let $: any;
 
 @Component({
     template: ''
@@ -172,11 +175,19 @@ export class Table {
         },
 
         createLinkForJSONfile(data) {
-        let link = this.outerLink.document.createElement('a');
-            link.setAttribute('href', 
-                              'data:text/plain;charset=utf-u,'+encodeURIComponent(data));
-            link.setAttribute('download', 'jsonfile.json');
-            link.click();
+            let link = this.outerLink.document.createElement('a');
+                link.setAttribute('href', 
+                                'data:text/plain;charset=utf-u,'+encodeURIComponent(data));
+                link.setAttribute('download', 'jsonfile.json');
+                link.click();
+        },
+
+        createLinkForCSVfile(data) {
+            let link = this.outerLink.document.createElement('a');
+                link.setAttribute('href', 
+                                'data:text/plain;charset=utf-u,'+encodeURIComponent(data));
+                link.setAttribute('download', 'csvfile.csv');
+                link.click();
         }
     };
 
@@ -342,8 +353,22 @@ export class Table {
             let JSONObject = this.loadJSON(),
                 processedJSON = this.processJSONBeforeStringify(JSONObject),
                 stringifiedJSON = JSON.stringify(processedJSON);
-                
+
             this.outerLink.TableManipulations.createLinkForJSONfile(stringifiedJSON);
+        },
+
+        saveAsCSVFile() {
+            let JSONObject = this.loadJSON(),
+                dataArray = [];
+
+            for (const obj in JSONObject) {
+                if(typeof JSONObject[obj] === 'object') {
+                    dataArray.push(JSONObject[obj]);
+                }
+            }
+
+            let csv = $.csv.fromObjects(dataArray);
+            this.outerLink.TableManipulations.createLinkForCSVfile(csv);
         },
         
         processJSONBeforeStringify(data) {

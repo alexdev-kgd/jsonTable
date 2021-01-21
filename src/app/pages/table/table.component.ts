@@ -39,5 +39,8 @@ export class TableComponent implements AfterViewInit {
   saveAsJSONFile() {
     this.table.JSONdata.saveAsJSONFile();
   }
+  saveAsCSVFile() {
+    this.table.JSONdata.saveAsCSVFile();
+  }
 
 }
