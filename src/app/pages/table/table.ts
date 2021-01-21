@@ -59,7 +59,6 @@ export class Table {
         },
 
         insertTitles(keys) {
-            console.log(keys);
             let renderer = this.outerLink.renderer,
                 th = this.outerLink.document.createElement('th'),
                 title = renderer.createText(keys),
@@ -237,17 +236,33 @@ export class Table {
                 keys = Object.keys(data),
                 container = this.outerLink.TableElements.getContainerElement(),
                 rowsElements = container.nativeElement.querySelectorAll('tr');
+
+            let deletedKey;
             for (let i = 0; i < keys.length; i++) {
-                if(+keys[i] == rowId) delete data[keys[i]];
+                if(+keys[i] == rowId) {
+                    deletedKey = +keys[i];
+                    delete data[keys[i]];
+                }
+            }
+            for (let j = 0; j < keys.length; j++) {
+                if(+keys[j] > deletedKey) {
+                    let decrementKey = +keys[j];
+                        decrementKey--;
+
+                        data[decrementKey] = data[keys[j]];
+                        delete data[keys[j]];
+                }
             }
         
-            for (let j = 0; j < rowsElements.length; j++) {
-                let rowDataValue = rowsElements[j].getAttribute('data-value');
-                if(rowDataValue == rowId) this.outerLink.renderer.removeChild(container, 
-                                                                    rowsElements[j]);
-            }
+            // for (let j = 0; j < rowsElements.length; j++) {
+            //     let rowDataValue = rowsElements[j].getAttribute('data-value');
+                
+            //     if(rowDataValue == rowId) this.outerLink.renderer.removeChild(container, 
+            //                                                         rowsElements[j]);
+            // }
         
             this.outerLink.JSONdata.saveJSON(data);
+            this.updateTable(data);
         },
 
         // Prevent IDs conflicts by searching up in row DOM Elements and compare their data-values
@@ -332,7 +347,6 @@ export class Table {
         },
 
         getValues(data) {
-            console.log(data);
             for(let i = 0; i < Object.values(data).length; i++) {
                 let length = Object.keys(data).length;
 
@@ -346,8 +360,6 @@ export class Table {
 
                     this.outerLink.TableManipulations.insertRow(values, rowIndex, data);
                 }
-
-                console.log(i);
             }            
         },
 
