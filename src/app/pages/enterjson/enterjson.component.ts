@@ -10,6 +10,7 @@ declare let $: any;
 })
 export class EnterjsonComponent implements OnInit {
   public jsonValue = '';
+  public errorString: string = '';
 
   constructor(private router: Router) { }
 
@@ -27,8 +28,7 @@ export class EnterjsonComponent implements OnInit {
     }
   }
 
-  public errorString: string = '';
-  onError(text: string): void {
+  private onError(text: string): void {
     this.errorString = text;
   }
 

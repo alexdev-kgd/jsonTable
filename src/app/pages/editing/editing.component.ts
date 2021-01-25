@@ -19,7 +19,7 @@ export class EditingComponent implements OnInit {
     this.editData(data);
   }
 
-  editData(data) {
+  editData(data: any): void {
     if ( (data.titles === undefined) && (data.values === undefined) ) {
       this.router.navigateByUrl('/enterjson');
     }
@@ -38,7 +38,7 @@ export class EditingComponent implements OnInit {
     }
   }
 
-  saveData() {
+  saveData(): void {
     this.router.navigateByUrl('/table', {state: {data: this.inputs,
       rowId: this.rowId,
       isNewRow: this.isNewRow}});
