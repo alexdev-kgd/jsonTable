@@ -1,4 +1,9 @@
 :host
+
+    .alert
+        margin: 15px auto
+        width: 500px
+
     #mainContainer
         margin: 0 auto
         width: 1000px
@@ -6,16 +11,65 @@
         display: flex
         justify-content: space-between
 
-    mat-form-field, #inputFileBlock
+    mat-form-field, #orBlock,#inputFileBlock
         display: inline-block
 
     mat-form-field
         width: 300px
 
+    #textareaLabel
+        font-size: 15px
+        font-weight: 500
+
+        #jsonTextarea
+            width: 400px
+            height: 150px
+            display: block
+            margin-top: 10px
+            padding: 10px
+            border: 1px solid #ddd
+
+    #orBlock
+        font-size: 30px
+        text-transform: uppercase
+        color: #808080
+        display: flex
+        align-items: center
+        position: relative
+
+        &:before, &:after
+            content: ""
+            position: absolute
+            width: 1px
+            height: 50px
+            background-color: #ddd
+            left: 50%
+            transform: translate(-50%, 0)
+
+        &:before
+            margin-top: 100px
+
+        &:after
+            margin-bottom: 100px
+
     #inputFileBlock
         width: -moz-fit-content
+        display: flex
+        align-items: center
 
     button
         width: 1000px
         margin: 0 auto
         display: block
+
+    [hidden]
+        display: none !important
+
+    label.btn.btn-primary
+        width: 170px
+        height: 120px
+        display: flex
+        justify-content: center
+        align-items: center
+        text-transform: uppercase
+        font-weight: 400

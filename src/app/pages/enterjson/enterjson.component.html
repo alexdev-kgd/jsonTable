@@ -1,13 +1,18 @@
+<h1 id="title">JSON/CSV Loader</h1>
+<div class="alert alert-danger" *ngIf="errorString.length">{{errorString}}</div>
 <div id="mainContainer">
-    <mat-form-field>
-        <mat-label>Введите свой JSON</mat-label>
+    <label id="textareaLabel">
+        Enter your JSON
         <textarea matInput
-                  cdkAutosizeMinRows="5"
-                  cdkAutosizeMaxRows="15" 
-                  [(ngModel)]="jsonValue"></textarea>
-    </mat-form-field>
+                cdkAutosizeMinRows="5"
+                cdkAutosizeMaxRows="15" 
+                [(ngModel)]="jsonValue" id="jsonTextarea"></textarea>
+    </label>
+    <span id="orBlock">Or</span>
     <div id="inputFileBlock">
-        <input type="file" (change)="onLoaded($event)">
+        <label class="btn btn-primary">
+            Load File <input type="file" (change)="onLoaded($event)" hidden>
+        </label>
     </div>
 </div>
 <button mat-stroked-button color="primary" (click)="textToJSON()">Load</button>

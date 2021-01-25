@@ -1,4 +1,5 @@
-<form>
+<h1 id="title">Edit Data</h1>
+<form id="editingForm">
     <div id="form__inputBlock" *ngFor="let field of inputs">
         <mat-form-field>
             <mat-label>{{ field.title }}</mat-label>
@@ -6,5 +7,5 @@
         </mat-form-field>
         <br>
     </div>
-    <button mat-stroked-button color="primary" (click)="saveData()">Save</button>
+    <button mat-stroked-button color="primary" (click)="saveData()" id="form__btn">Save</button>
 </form>
