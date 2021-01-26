@@ -9,8 +9,9 @@ declare let $: any;
   styleUrls: ['./enterjson.component.sass'],
 })
 export class EnterjsonComponent implements OnInit {
-  public jsonValue = '[{"name":"Name 1","year":"2010"},{"name":"Name 2","year":"1997"},{"name":"Name 3","year":"2004"}]';
+  public jsonValue = '';
   public errorString: string = '';
+  public infoString: string = '';
 
   constructor(private router: Router) { }
 
@@ -30,6 +31,10 @@ export class EnterjsonComponent implements OnInit {
 
   private onError(text: string): void {
     this.errorString = text;
+  }
+
+  private onInfo(text: string): void {
+    this.infoString = text;
   }
 
   onLoaded(event: any): void {
@@ -63,6 +68,7 @@ export class EnterjsonComponent implements OnInit {
   }
 
   checkData(data: any): void {
+    if (data.isTableEmpty) this.onInfo('Table is empty');
     const stringifiedJSON = data.stringifiedJSON;
 
     if (stringifiedJSON !== undefined) {
