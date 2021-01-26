@@ -43,4 +43,8 @@ export class EditingComponent implements OnInit {
       rowId: this.rowId,
       isNewRow: this.isNewRow}});
   }
+
+  cancel(): void {
+    this.router.navigateByUrl('/table', {state: {cancelled: true}});
+  }
 }

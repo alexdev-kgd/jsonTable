@@ -48,7 +48,6 @@ export class EnterjsonComponent implements OnInit {
     const reader = new FileReader();
     reader.readAsText(file, 'UTF-8');
     reader.onload = (evt) => {
-      console.log(evt);
       let receivedJSON;
       if (file.type == 'application/vnd.ms-excel') {
         receivedJSON = JSON.stringify($.csv.toObjects(evt.target['result']));

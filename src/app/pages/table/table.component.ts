@@ -24,13 +24,18 @@ export class TableComponent implements OnInit {
     this.json = history.state;
     const hasRowId = this.tableData.checkData(this.json);
 
-    if (hasRowId) {
+    if (this.json.cancelled) {
       const oldData = this.tableData.loadJSON();
-      const editedJSON = this.tableData.getEditedJSON(oldData, this.json);
-      this.getData(editedJSON);
+      this.getData(oldData);
     } else {
-      this.tableData.saveJSON(this.json);
-      this.getData(this.json);
+      if (hasRowId) {
+        const oldData = this.tableData.loadJSON();
+        const editedJSON = this.tableData.getEditedJSON(oldData, this.json);
+        this.getData(editedJSON);
+      } else {
+        this.tableData.saveJSON(this.json);
+        this.getData(this.json);
+      }
     }
   }
 
