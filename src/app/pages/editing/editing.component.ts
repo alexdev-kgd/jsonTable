@@ -20,7 +20,7 @@ export class EditingComponent implements OnInit {
   }
 
   editData(data: any): void {
-    if ( (data.titles === undefined) && (data.values === undefined) ) {
+    if ( (data.titles === undefined) || (data.values === undefined) ) {
       this.router.navigateByUrl('/enterjson');
     }
 

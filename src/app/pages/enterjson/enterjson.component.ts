@@ -9,7 +9,7 @@ declare let $: any;
   styleUrls: ['./enterjson.component.sass'],
 })
 export class EnterjsonComponent implements OnInit {
-  public jsonValue = '';
+  public jsonValue = '[{"name":"Name 1","year":"2010"},{"name":"Name 2","year":"1997"},{"name":"Name 3","year":"2004"}]';
   public errorString: string = '';
 
   constructor(private router: Router) { }
@@ -19,7 +19,7 @@ export class EnterjsonComponent implements OnInit {
     this.checkData(json);
   }
 
-  isJSONValid(json: any): void {
+  isJSONValid(json: string): void {
     try {
       JSON.parse(json);
     } catch (e) {
@@ -48,6 +48,7 @@ export class EnterjsonComponent implements OnInit {
     const reader = new FileReader();
     reader.readAsText(file, 'UTF-8');
     reader.onload = (evt) => {
+      console.log(evt);
       let receivedJSON;
       if (file.type == 'application/vnd.ms-excel') {
         receivedJSON = JSON.stringify($.csv.toObjects(evt.target['result']));
@@ -86,11 +87,11 @@ export class EnterjsonComponent implements OnInit {
     this.sendToTable(json);
   }
 
-  sendToTable(json: any): void {
+  sendToTable(json: Object): void {
     this.router.navigateByUrl('/table', {state: json});
   }
 
-  appendData(data: any): void {
+  appendData(data: string): void {
     this.jsonValue = data;
   }
 }

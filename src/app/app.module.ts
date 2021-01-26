@@ -14,7 +14,6 @@ import {TextFieldModule} from '@angular/cdk/text-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {Table} from './pages/table/table';
 import {WindowRefService} from './pages/window-ref.service';
 import {AlertModule} from 'ngx-bootstrap/alert';
 
@@ -42,10 +41,7 @@ import {AlertModule} from 'ngx-bootstrap/alert';
     TableComponent,
     EditingComponent,
   ],
-  providers: [{
-    provide: Table,
-    useClass: Table,
-  }, WindowRefService],
+  providers: [WindowRefService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

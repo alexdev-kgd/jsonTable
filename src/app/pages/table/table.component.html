@@ -1,9 +1,32 @@
 <table class="table table-striped">
   <thead class="thead-dark">
-    <tr id="table__header" #tableHeader>
+    <tr id="table__header" #tableHeader *ngIf="titles">
+      <th *ngFor="let title of titles">{{title | titlecase}}</th>
+      <th class="btnCell">
+        <button class="btn btn-primary" 
+                (click)="createNewRow(titles)">Add New Row</button>
+      </th>
     </tr>
   </thead>
-  <tbody id="table__content" #tableContent>
+  <tbody id="table__content" #tableContent *ngIf="data">
+    <tr *ngFor="let rowData of data"
+        (click)="editValues(rowData.id, rowData.values, titles, false)">
+      <td *ngFor="let value of rowData.values">{{value}}</td>
+      <td class="btnCell">
+        <button class="btn btn-secondary"
+                (click)="deleteRow($event, rowData.id)">Delete</button>
+        <div class="orderBtnsContainer">
+          <button class="btn btn-primary btn-up"
+                  (click)="moveRow($event, 'up', rowData.id)">
+            <i class="fas fa-arrow-up"></i>
+          </button>
+          <button class="btn btn-primary btn-down"
+                  (click)="moveRow($event, 'down', rowData.id)">
+            <i class="fas fa-arrow-down"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
   </tbody>
 </table>
 <div id="btnContainer">
