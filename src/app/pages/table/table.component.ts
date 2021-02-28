@@ -39,7 +39,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  getData(json: Object) {
+  getData(json) {
     if (json[0] === undefined) {
       this.router.navigateByUrl('/enterjson', {state: {isTableEmpty: true}});
       return;

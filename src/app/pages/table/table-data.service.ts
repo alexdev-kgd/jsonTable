@@ -15,15 +15,15 @@ export class TableDataService {
     return ( json.isNewRow === undefined) ? false : true;
   }
 
-  getTitles(json: Object): string[] {
+  getTitles(json): string[] {
     return Object.keys(json[0]);
   }
 
-  getRowsCount(json: Object): number {
+  getRowsCount(json): number {
     return Object.keys(json).length-1;
   }
 
-  getValues(json: Object): any[] {
+  getValues(json): any[] {
     const values = [];
 
     for (let i = 0; i < Object.keys(json).length-1; i++) {
@@ -40,7 +40,7 @@ export class TableDataService {
     return values;
   }
 
-  getEditedJSON(oldData: Object, data: Object): Object {
+  getEditedJSON(oldData, data) {
     let editedJSON;
         data['isNewRow'] ? editedJSON = this.insertNewJSONRow(oldData, data) :
         editedJSON = this.replaceJSONRow(oldData, data);
@@ -53,13 +53,13 @@ export class TableDataService {
   preventConflict(newDataRowId: number, rows: Array<any>): number {
     for (let i = 0; i < rows.length; i++ ) {
       const rowId = rows[i].id;
-      if (rowId == newDataRowId) newDataRowId++;
+      if (rowId === newDataRowId) newDataRowId++;
     }
 
     return newDataRowId;
   }
 
-  insertNewJSONRow(oldData, data): Object {
+  insertNewJSONRow(oldData, data) {
     const JSONValueObject = {};
 
     for (let i = 0; i < data.data.length; i++) {
@@ -82,15 +82,15 @@ export class TableDataService {
     return updatedJSON;
   }
 
-  replaceJSONRow(oldData, data): Object {
+  replaceJSONRow(oldData, data) {
     const id = data.rowId;
 
     for (const el in oldData) {
-      if (el == id) {
+      if (el === id) {
         const oldDataKeys = Object.keys(oldData[el]);
         for (let i = 0; i < data.data.length; i++) {
           for (let j = 0; j < oldDataKeys.length; j++) {
-            if (data.data[i].title == oldDataKeys[j]) {
+            if (data.data[i].title === oldDataKeys[j]) {
               oldData[el][oldDataKeys[j]] = data.data[i].value;
             }
           }
@@ -104,11 +104,11 @@ export class TableDataService {
     return updatedData;
   }
 
-  deleteRow(rowId: number, data: Object) {
+  deleteRow(rowId: number, data) {
     let deletedKey;
     const keys = Object.keys(data);
     for (let i = 0; i < keys.length; i++) {
-      if (+keys[i] == rowId) {
+      if (+keys[i] === rowId) {
         deletedKey = +keys[i];
         delete data[keys[i]];
       }
@@ -126,11 +126,11 @@ export class TableDataService {
     this.saveJSON(data);
   }
 
-  moveRow(data: Object, direction: string, rowId: number) {
+  moveRow(data, direction: string, rowId: number) {
     const keys = Object.keys(data);
     for (let i = 0; i < keys.length; i++) {
-      if (+keys[i] == rowId) {
-        if (direction == 'up') {
+      if (+keys[i] === rowId) {
+        if (direction === 'up') {
           let decrementKey = +keys[i];
           decrementKey--;
 
@@ -138,7 +138,7 @@ export class TableDataService {
           const saveRowData = data[decrementKey];
           data[decrementKey] = data[keys[i]];
           data[keys[i]] = saveRowData;
-        } else if (direction == 'down') {
+        } else if (direction === 'down') {
           let incrementKey = +keys[i];
           incrementKey++;
 
@@ -152,15 +152,15 @@ export class TableDataService {
     this.saveJSON(data);
   }
 
-  loadJSON(): Object {
+  loadJSON() {
     return JSON.parse(localStorage.getItem('tableData'));
   }
 
-  saveJSON(data: Object): void {
+  saveJSON(data): void {
     localStorage.setItem('tableData', JSON.stringify(data));
   }
 
-  private processJSONBeforeStringify(json: Object): any[] {
+  private processJSONBeforeStringify(json): any[] {
     delete json['navigationId'];
 
     const jsonArray = [];
